@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DrawBehindDesktopIcons": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
