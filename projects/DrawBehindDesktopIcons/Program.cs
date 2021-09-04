@@ -1,17 +1,13 @@
 ﻿// Inspiration: https://www.codeproject.com/Articles/856020/Draw-Behind-Desktop-Icons-in-Windows-plus
 using DrawBehindDesktopIcons;
-using PInvoke;
 using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Threading;
-using static PInvoke.User32;
 using static DrawBehindDesktopIcons.Helpers;
+using static PInvoke.User32;
 
 const WindowMessage DoMagicwindowStuff = (WindowMessage)0x052C;
 
 bool dpiSet = SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-if(!dpiSet)
+if (!dpiSet)
 {
     ThrowLoastWin32();
 }
@@ -37,11 +33,21 @@ Console.WriteLine("sent");
 IntPtr theMagicWindow = FindMagicWindow();
 
 Console.WriteLine("We're good to go");
-RotateColors(theMagicWindow);
+Console.WriteLine("Press 1 to rotate via GDI, anything else to rotate via Visual Layer");
+var key = Console.ReadKey(true);
 
-IDesktopWallpaper desktopWallpaper = CreateIDesktopWallpaper();
+if (key.KeyChar == '1')
+{
+    RotateColors(theMagicWindow);
+}
+else
+{
+    DoVisualLayerStuff(theMagicWindow);
+}
 
 Console.WriteLine("Blipping wallper to clear, this annoyingly takes a few seconds...");
+
 // Best way I've found to get rid of the window...
+IDesktopWallpaper desktopWallpaper = CreateIDesktopWallpaper();
 desktopWallpaper.Enable(false);
 desktopWallpaper.Enable(true);
