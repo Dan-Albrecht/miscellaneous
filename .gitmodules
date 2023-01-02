@@ -1,0 +1,3 @@
+[submodule "projects/T-Display-S3_IDF_HelloWorld/components/lvgl"]
+	path = projects/T-Display-S3_IDF_HelloWorld/components/lvgl
+	url = https://github.com/lvgl/lvgl.git
