@@ -13,10 +13,7 @@
 
 #include "nvs_flash.h"
 
-#include "lvgl.h"
-#include "demos/lv_demos.h"
-
-#include "lvgl_helpers.h"
+#include "LcdStuff.h"
 
 void doSomeWifi(void);
 void doSomePixels(void);
@@ -51,7 +48,7 @@ void app_main()
 
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
     //doSomeWifi();
-    doSomePixels();
+    DoEverything();
 
     while (1)
     {
@@ -125,11 +122,5 @@ void doSomeWifi(void)
     fast_scan();
 }
 
-void doSomePixels(void)
-{
-    lv_init();
-    //st7789_init();
-    lvgl_driver_init();
-    lv_demo_benchmark();
-}
- 
+// https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32s3/api-reference/peripherals/lcd.html
+// https://github.com/espressif/esp-idf/tree/v4.4.3/examples/peripherals/lcd/lvgl
