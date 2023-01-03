@@ -30,7 +30,7 @@ void DoEverything(void);
 #define EXAMPLE_PIN_NUM_DATA5          46
 #define EXAMPLE_PIN_NUM_DATA6          47
 #define EXAMPLE_PIN_NUM_DATA7          48
-#define EXAMPLE_PIN_NUM_PCLK           8
+#define ZZZ_EXAMPLE_PIN_NUM_PCLK           8 // ?
 #define EXAMPLE_PIN_NUM_CS             6
 #define EXAMPLE_PIN_NUM_DC             7
 #define EXAMPLE_PIN_NUM_RST            5
@@ -43,6 +43,9 @@ void DoEverything(void);
 #define EXAMPLE_LCD_CMD_BITS           8
 #define EXAMPLE_LCD_PARAM_BITS         8
 
-#define EXAMPLE_LVGL_TICK_PERIOD_MS    2 // ? seems uniqe to this demo
+#define EXAMPLE_LVGL_TICK_PERIOD_MS   3
 
 #define LCD_PIN_POWER 15
+#define LCD_PIN_RD 9
+#define LCD_PIN_WR 8
+#define THING (EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES)

@@ -56,7 +56,7 @@ void app_main()
 
         for (int i = 0; i < 10; i++)
         {
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
     }
 }
