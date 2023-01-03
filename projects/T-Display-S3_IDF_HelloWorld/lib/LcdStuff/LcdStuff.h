@@ -44,3 +44,5 @@ void DoEverything(void);
 #define EXAMPLE_LCD_PARAM_BITS         8
 
 #define EXAMPLE_LVGL_TICK_PERIOD_MS    2 // ? seems uniqe to this demo
+
+#define LCD_PIN_POWER 15

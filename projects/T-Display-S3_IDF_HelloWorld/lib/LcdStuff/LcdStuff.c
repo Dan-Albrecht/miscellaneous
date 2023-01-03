@@ -33,6 +33,9 @@ static void example_increase_lvgl_tick(void *arg)
 
 void DoEverything(void)
 {
+    gpio_set_direction(LCD_PIN_POWER, GPIO_MODE_OUTPUT);
+    gpio_set_level(LCD_PIN_POWER, 1);
+
     static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
     static lv_disp_drv_t disp_drv;      // contains callback functions
 
@@ -134,11 +137,12 @@ void DoEverything(void)
     {
         ESP_LOGI(LCD_TAG, "Default is what we expect");
     }
-    else{
+    else
+    {
         ESP_LOGI(LCD_TAG, "Shit is fucked");
     }
 
-    //lv_demo_benchmark();
+    // lv_demo_benchmark();
     lv_demo_widgets();
 
     while (1)
