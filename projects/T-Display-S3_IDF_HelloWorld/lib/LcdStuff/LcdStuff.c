@@ -44,7 +44,7 @@ static bool example_notify_lvgl_flush_ready(esp_lcd_panel_io_handle_t panel_io, 
             lv_disp_flush_ready(disp_driver);
         }
     }
-    
+
     return false;
 }
 
@@ -70,12 +70,6 @@ static lv_disp_drv_t disp_drv;      // contains callback functions
 
 esp_lcd_panel_handle_t StartLcdDriver(void)
 {
-    gpio_set_direction(LCD_PIN_POWER, GPIO_MODE_OUTPUT);
-    gpio_set_level(LCD_PIN_POWER, 1);
-
-    gpio_set_direction(LCD_PIN_RD, GPIO_MODE_OUTPUT);
-    gpio_set_level(LCD_PIN_RD, 1);
-
     ESP_LOGI(LCD_TAG, "Turn off LCD backlight");
     gpio_config_t bk_gpio_config = {
         .mode = GPIO_MODE_OUTPUT,
@@ -83,7 +77,14 @@ esp_lcd_panel_handle_t StartLcdDriver(void)
     ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
     gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
 
-    ESP_LOGI(LCD_TAG, "Initialize Intel 8080 bus");
+    ESP_LOGI(LCD_TAG, "Turn on LCD power");
+    ESP_ERROR_CHECK(gpio_set_direction(LCD_PIN_POWER, GPIO_MODE_OUTPUT));
+    ESP_ERROR_CHECK(gpio_set_level(LCD_PIN_POWER, 1));
+
+    ESP_LOGI(LCD_TAG, "Turn on whatever the RD pin is");
+    ESP_ERROR_CHECK(gpio_set_direction(LCD_PIN_RD, GPIO_MODE_OUTPUT));
+    ESP_ERROR_CHECK(gpio_set_level(LCD_PIN_RD, 1));
+
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
         .dc_gpio_num = EXAMPLE_PIN_NUM_DC,
@@ -99,10 +100,12 @@ esp_lcd_panel_handle_t StartLcdDriver(void)
             EXAMPLE_PIN_NUM_DATA7,
         },
         .bus_width = 8,
-        //.max_transfer_bytes = EXAMPLE_LCD_H_RES * 40 * sizeof(uint16_t)
-        .max_transfer_bytes = THING * sizeof(uint16_t),
+        .max_transfer_bytes = LCD_BUFFER_BYTES,
     };
+
+    ESP_LOGI(LCD_TAG, "Initialize Intel 8080 bus");
     ESP_ERROR_CHECK(esp_lcd_new_i80_bus(&bus_config, &i80_bus));
+
     esp_lcd_panel_io_handle_t io_handle = NULL;
     esp_lcd_panel_io_i80_config_t io_config = {
         .cs_gpio_num = EXAMPLE_PIN_NUM_CS,
@@ -115,31 +118,40 @@ esp_lcd_panel_handle_t StartLcdDriver(void)
             .dc_dummy_level = 0,
             .dc_data_level = 1,
         },
+        .flags = {
+            .swap_color_bytes = !LV_COLOR_16_SWAP,
+        },
         .on_color_trans_done = example_notify_lvgl_flush_ready,
         .user_ctx = &disp_drv,
         .lcd_cmd_bits = EXAMPLE_LCD_CMD_BITS,
         .lcd_param_bits = EXAMPLE_LCD_PARAM_BITS,
     };
+
+    ESP_LOGI(LCD_TAG, "Initialize Intel 8080 panel");
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_i80(i80_bus, &io_config, &io_handle));
 
-    ESP_LOGI(LCD_TAG, "Install LCD driver of st7789");
     esp_lcd_panel_handle_t panel_handle = NULL;
     esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = EXAMPLE_PIN_NUM_RST,
+        // This seems to control endian on later versions of IDF and fixes our wrong color problems
         .color_space = ESP_LCD_COLOR_SPACE_RGB,
+        //.color_space = ESP_LCD_COLOR_SPACE_BGR,
         .bits_per_pixel = 16,
     };
+
+    ESP_LOGI(LCD_TAG, "Install LCD driver of st7789");
     ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(io_handle, &panel_config, &panel_handle));
+    ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
+    ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
+    ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, true));
+    ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(panel_handle, true));
+    ESP_ERROR_CHECK(esp_lcd_panel_mirror(panel_handle, false, true));
 
-    esp_lcd_panel_reset(panel_handle);
-    esp_lcd_panel_init(panel_handle);
-    esp_lcd_panel_invert_color(panel_handle, true);
-    esp_lcd_panel_swap_xy(panel_handle, true);
-    esp_lcd_panel_mirror(panel_handle, false, true);
     // the gap is LCD panel specific, even panels with the same driver IC, can have different gap value
-    esp_lcd_panel_set_gap(panel_handle, 0, 35);
+    ESP_ERROR_CHECK(esp_lcd_panel_set_gap(panel_handle, 0, 35));
 
-    for (uint8_t i = 0; i < (sizeof(lcd_st7789v) / sizeof(lcd_cmd_t)); i++)
+    // BUGBUG: Need to figure out what this magic is
+    /*for (uint8_t i = 0; i < (sizeof(lcd_st7789v) / sizeof(lcd_cmd_t)); i++)
     {
         esp_lcd_panel_io_tx_param(io_handle, lcd_st7789v[i].cmd, lcd_st7789v[i].data, lcd_st7789v[i].len & 0x7f);
         if (lcd_st7789v[i].len & 0x80)
@@ -147,10 +159,10 @@ esp_lcd_panel_handle_t StartLcdDriver(void)
             // delay(120);
             vTaskDelay(pdMS_TO_TICKS(120));
         }
-    }
+    }*/
 
     ESP_LOGI(LCD_TAG, "Turn on LCD backlight");
-    gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
+    ESP_ERROR_CHECK(gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL));
 
     return panel_handle;
 }
@@ -168,8 +180,8 @@ void DoLvgl(esp_lcd_panel_handle_t panel_handle)
     // initialize LVGL draw buffers
     lv_disp_draw_buf_init(&disp_buf, buf1, buf2, EXAMPLE_LCD_H_RES * 20);*/
 
-    lv_color_t *lv_disp_buf = (lv_color_t *)heap_caps_malloc(THING * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    lv_disp_draw_buf_init(&disp_buf, lv_disp_buf, NULL, THING);
+    lv_color_t *lv_disp_buf = (lv_color_t *)heap_caps_malloc(LCD_BUFFER_BYTES, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    lv_disp_draw_buf_init(&disp_buf, lv_disp_buf, NULL, LCD_BUFFER_LENGTH);
 
     ESP_LOGI(LCD_TAG, "Register display driver to LVGL");
     lv_disp_drv_init(&disp_drv);
@@ -202,8 +214,8 @@ void DoLvgl(esp_lcd_panel_handle_t panel_handle)
         ESP_LOGI(LCD_TAG, "Shit is fucked");
     }
 
-    lv_demo_benchmark();
-    // lv_demo_widgets();
+    //lv_demo_benchmark();
+    lv_demo_widgets();
 
     while (1)
     {
@@ -214,18 +226,75 @@ void DoLvgl(esp_lcd_panel_handle_t panel_handle)
     }
 }
 
-void DoEverything(void)
+#define MY_WHITE 0xFFFF
+#define MY_RED 0xF800
+#define MY_GREEN 0x07E0
+#define MY_BLUE 0x001F
+
+void DoRawDraw(esp_lcd_panel_handle_t panel_handle)
 {
-    ESP_LOGI(LCD_TAG, "Starting LCD driver...");
-    esp_lcd_panel_handle_t panel_handle = StartLcdDriver();
+    // green == red
+    // white == white
+    // red == blue
+    // blue == green
+
+    // endian switch
+    // red == red
+    // green == blue
+    // blue == green
+
+    // ST7789 wrong color
+    // https://esp32.com/viewtopic.php?t=31304
 
     ESP_LOGI(LCD_TAG, "Filling random meory...");
-    size_t len = THING;
+    uint16_t *img = heap_caps_malloc(LCD_BUFFER_BYTES, MALLOC_CAP_DMA);
+    for (size_t i = 0; i < LCD_BUFFER_LENGTH; i++)
+    {
+        img[i] = MY_WHITE;
+    }
+
+    // TOP with usb on left
+    for (size_t i = 0; i < 5; i++)
+    {
+        size_t rowOffset = i * EXAMPLE_LCD_H_RES;
+
+        for (size_t j = 0; j < EXAMPLE_LCD_H_RES; j++)
+        {
+            img[rowOffset + j] = MY_WHITE;
+        }
+    }
+
+    for (size_t i = 50; i < 55; i++)
+    {
+        size_t rowOffset = i * EXAMPLE_LCD_H_RES;
+
+        for (size_t j = 0; j < EXAMPLE_LCD_H_RES; j++)
+        {
+            img[rowOffset + j] = MY_GREEN;
+        }
+    }
+
+    for (size_t i = EXAMPLE_LCD_V_RES - 5; i < EXAMPLE_LCD_V_RES; i++)
+    {
+        size_t rowOffset = i * EXAMPLE_LCD_H_RES;
+
+        for (size_t j = 0; j < EXAMPLE_LCD_H_RES; j++)
+        {
+            img[rowOffset + j] = MY_RED;
+        }
+    }
+
+    ESP_LOGI(LCD_TAG, "Rendering...");
+    ESP_ERROR_CHECK(esp_lcd_panel_draw_bitmap(panel_handle, 0, 0, EXAMPLE_LCD_H_RES, EXAMPLE_LCD_V_RES, img));
+
+
+
+    /*size_t len = THING;
     size_t size = THING * 2;
     uint16_t *img = heap_caps_malloc(size, MALLOC_CAP_DMA);
-    assert(img);
+    assert(img);*/
 
-    for (size_t i = 0; i < len; i++)
+    /*for (size_t i = 0; i < len; i++)
     {
         if ((i % EXAMPLE_LCD_H_RES) < (EXAMPLE_LCD_H_RES / 2))
         {
@@ -236,15 +305,38 @@ void DoEverything(void)
         {
             img[i] = 0xFFFF;
         }
+    }*/
+
+    /*lv_color_t buf[EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES];
+    lv_color_t *buf_p = buf;*/
+    /*lv_color_t *buf_p = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES * sizeof(lv_color_t), MALLOC_CAP_DMA);
+    uint16_t x, y;
+    for (y = 0; y < EXAMPLE_LCD_V_RES; y++)
+    {
+        lv_color_t c = lv_color_mix(LV_COLOR_BLUE, LV_COLOR_RED, (y * 255) / EXAMPLE_LCD_V_RES);
+        for (x = 0; x < EXAMPLE_LCD_H_RES; x++)
+        {
+            (*buf_p) = c;
+            buf_p++;
+        }
     }
+
+    lv_area_t a;
+    a.x1 = 10;
+    a.y1 = 40;
+    a.x2 = a.x1 + EXAMPLE_LCD_H_RES - 1;
+    a.y2 = a.y1 + EXAMPLE_LCD_V_RES - 1;
 
     ESP_LOGI(LCD_TAG, "Rendering...");
-    ESP_ERROR_CHECK(esp_lcd_panel_draw_bitmap(panel_handle, 0, 0, EXAMPLE_LCD_H_RES, EXAMPLE_LCD_V_RES, img));
+    // ESP_ERROR_CHECK(esp_lcd_panel_draw_bitmap(panel_handle, 0, 0, EXAMPLE_LCD_H_RES, EXAMPLE_LCD_V_RES, img));
+    my_flush_cb(NULL, &a, buf_p, panel_handle);*/
+}
 
-    while (1)
-    {
-        vTaskDelay(pdMS_TO_TICKS(10));
-        // The task running lv_timer_handler should have lower priority than that running `lv_tick_inc`
-        lv_timer_handler();
-    }
+void DoEverything(void)
+{
+    ESP_LOGI(LCD_TAG, "Starting LCD driver...");
+    esp_lcd_panel_handle_t panel_handle = StartLcdDriver();
+
+    ESP_LOGI(LCD_TAG, "Doing LVGL...");
+    DoLvgl(panel_handle);
 }

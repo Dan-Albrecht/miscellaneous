@@ -48,4 +48,6 @@ void DoEverything(void);
 #define LCD_PIN_POWER 15
 #define LCD_PIN_RD 9
 #define LCD_PIN_WR 8
-#define THING (EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES)
+
+#define LCD_BUFFER_LENGTH (EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES)
+#define LCD_BUFFER_BYTES  (LCD_BUFFER_LENGTH * sizeof(uint16_t))
