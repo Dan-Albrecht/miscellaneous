@@ -13,15 +13,15 @@
 #include "lvgl.h"
 #include "demos/lv_demos.h"
 
-// Does some really imporant stuff
-void DoEverything(void);
+lv_disp_t * InitLcd(void);
+void TickLcd(void);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// Please update the following configuration according to your LCD spec //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define EXAMPLE_LCD_PIXEL_CLOCK_HZ     (20 * 1000 * 1000)
-#define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1 // ?? think good
-#define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL // ? think good
+#define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1
+#define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL
 #define EXAMPLE_PIN_NUM_DATA0          39
 #define EXAMPLE_PIN_NUM_DATA1          40
 #define EXAMPLE_PIN_NUM_DATA2          41
@@ -30,7 +30,6 @@ void DoEverything(void);
 #define EXAMPLE_PIN_NUM_DATA5          46
 #define EXAMPLE_PIN_NUM_DATA6          47
 #define EXAMPLE_PIN_NUM_DATA7          48
-#define ZZZ_EXAMPLE_PIN_NUM_PCLK           8 // ?
 #define EXAMPLE_PIN_NUM_CS             6
 #define EXAMPLE_PIN_NUM_DC             7
 #define EXAMPLE_PIN_NUM_RST            5

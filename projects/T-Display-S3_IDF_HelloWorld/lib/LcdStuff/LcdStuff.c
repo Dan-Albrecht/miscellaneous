@@ -167,7 +167,7 @@ esp_lcd_panel_handle_t StartLcdDriver(void)
     return panel_handle;
 }
 
-void DoLvgl(esp_lcd_panel_handle_t panel_handle)
+lv_disp_t *DoLvgl(esp_lcd_panel_handle_t panel_handle)
 {
     ESP_LOGI(LCD_TAG, "Initialize LVGL library");
     lv_init();
@@ -214,16 +214,18 @@ void DoLvgl(esp_lcd_panel_handle_t panel_handle)
         ESP_LOGI(LCD_TAG, "Shit is fucked");
     }
 
-    //lv_demo_benchmark();
-    lv_demo_widgets();
+    // lv_demo_benchmark();
+    // lv_demo_widgets();
 
-    while (1)
-    {
-        // raise the task priority of LVGL and/or reduce the handler period can improve the performance
-        vTaskDelay(pdMS_TO_TICKS(10));
-        // The task running lv_timer_handler should have lower priority than that running `lv_tick_inc`
-        lv_timer_handler();
-    }
+    return def;
+}
+
+void TickLcd(void)
+{
+    // raise the task priority of LVGL and/or reduce the handler period can improve the performance
+    vTaskDelay(pdMS_TO_TICKS(10));
+    // The task running lv_timer_handler should have lower priority than that running `lv_tick_inc`
+    lv_timer_handler();
 }
 
 #define MY_WHITE 0xFFFF
@@ -286,8 +288,6 @@ void DoRawDraw(esp_lcd_panel_handle_t panel_handle)
 
     ESP_LOGI(LCD_TAG, "Rendering...");
     ESP_ERROR_CHECK(esp_lcd_panel_draw_bitmap(panel_handle, 0, 0, EXAMPLE_LCD_H_RES, EXAMPLE_LCD_V_RES, img));
-
-
 
     /*size_t len = THING;
     size_t size = THING * 2;
