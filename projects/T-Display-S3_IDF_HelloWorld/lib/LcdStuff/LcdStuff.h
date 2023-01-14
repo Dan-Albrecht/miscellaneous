@@ -1,5 +1,8 @@
 #pragma once
 
+// https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32s3/api-reference/peripherals/lcd.html
+// https://github.com/espressif/esp-idf/tree/v4.4.3/examples/peripherals/lcd/lvgl
+
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

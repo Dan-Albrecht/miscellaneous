@@ -4,6 +4,12 @@
         "lv_demos.h": "c",
         "lv_printf.h": "c",
         "atomic": "cpp",
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "lcdstuff.h": "c",
+        "inttypes.h": "c",
+        "stdio.h": "c",
+        "esp_chip_info.h": "c",
+        "freertos.h": "c",
+        "sdkconfig.h": "c"
     }
 }
