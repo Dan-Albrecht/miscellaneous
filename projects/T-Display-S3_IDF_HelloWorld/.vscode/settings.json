@@ -1,6 +1,9 @@
 {
     "cmake.configureOnOpen": false,
     "files.associations": {
-        "lv_demos.h": "c"
+        "lv_demos.h": "c",
+        "lv_printf.h": "c",
+        "atomic": "cpp",
+        "cstdint": "cpp"
     }
 }
