@@ -332,11 +332,13 @@ void DoRawDraw(esp_lcd_panel_handle_t panel_handle)
     my_flush_cb(NULL, &a, buf_p, panel_handle);*/
 }
 
-void DoEverything(void)
+lv_disp_t *InitLcd(void)
 {
     ESP_LOGI(LCD_TAG, "Starting LCD driver...");
     esp_lcd_panel_handle_t panel_handle = StartLcdDriver();
 
     ESP_LOGI(LCD_TAG, "Doing LVGL...");
-    DoLvgl(panel_handle);
+    lv_disp_t *result = DoLvgl(panel_handle);
+
+    return result;
 }

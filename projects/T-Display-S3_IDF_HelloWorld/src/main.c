@@ -48,15 +48,15 @@ void app_main()
 
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
     //doSomeWifi();
-    DoEverything();
+    InitLcd();
 
     while (1)
     {
         printf("Nothing else to do, but still running.\n");
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 1000; i++)
         {
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            TickLcd();
         }
     }
 }
