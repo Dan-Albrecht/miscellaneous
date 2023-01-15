@@ -1,3 +1,6 @@
 [submodule "projects/T-Display-S3_PlatformIO-IDF_HelloWorld/components/lvgl"]
 	path = projects/T-Display-S3_PlatformIO-IDF_HelloWorld/components/lvgl
 	url = https://github.com/lvgl/lvgl.git
+[submodule "projects/T-Display-S3_ESP-IDF_HelloWorld/components/lvgl"]
+	path = projects/T-Display-S3_ESP-IDF_HelloWorld/components/lvgl
+	url = https://github.com/Dan-Albrecht/lvgl
