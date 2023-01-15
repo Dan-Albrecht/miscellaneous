@@ -9,5 +9,10 @@
     ],
     "idf.pythonBinPathWin": "F:\\esp-idf-tools\\python_env\\idf5.0_py3.8_env\\Scripts\\python.exe",
     "idf.toolsPathWin": "F:\\esp-idf-tools",
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "idf.flashType": "UART",
+    "files.associations": {
+        "boardstuff.h": "c",
+        "esp_psram.h": "c"
+    }
 }
