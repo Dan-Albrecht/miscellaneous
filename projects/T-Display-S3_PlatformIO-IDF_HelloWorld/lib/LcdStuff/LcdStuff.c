@@ -215,7 +215,7 @@ lv_disp_t *DoLvgl(esp_lcd_panel_handle_t panel_handle)
     }
 
     // lv_demo_benchmark();
-    // lv_demo_widgets();
+    lv_demo_widgets();
 
     return def;
 }
