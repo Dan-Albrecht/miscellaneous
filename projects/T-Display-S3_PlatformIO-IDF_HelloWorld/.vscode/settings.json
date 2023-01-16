@@ -11,6 +11,5 @@
         "esp_chip_info.h": "c",
         "freertos.h": "c",
         "sdkconfig.h": "c"
-    },
-    "idf.adapterTargetName": "esp32"
+    }
 }
