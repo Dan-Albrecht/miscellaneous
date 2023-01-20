@@ -1,7 +1,13 @@
 {
     "configurations": [
         {
-            "name": "ESP-IDF",
+            "name": "ESP-IDF_CompileCommands",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        },
+        {
+            "name": "ESP-IDF_Shitty",
             "compilerPath": "F:\\esp-idf-tools\\tools\\xtensa-esp32-elf\\esp-2022r1-11.2.0\\xtensa-esp32-elf\\bin\\xtensa-esp32-elf-gcc.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",

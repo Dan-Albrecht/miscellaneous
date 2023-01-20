@@ -3,8 +3,67 @@
   "configurations": [
     {
       "type": "espidf",
-      "name": "Launch",
+      "name": "ESP Launch",
       "request": "launch"
+    },
+    {
+      "type": "espidf",
+      "name": "IDF Launch",
+      "request": "launch",
+      "debugPort": 9998,
+      "logLevel": 2,
+      "mode": "auto",
+      "verifyAppBinBeforeDebug": false,
+      "tmoScaleFactor": 1,
+      "initGdbCommands": [
+        "target remote :3333",
+        "F:\\git\\miscellaneous\\projects\\T-Display-S3_ESP-IDF_HelloWorld\\build\\T-Display-S3_ESP-IDF_HelloWorld.elf",
+        "mon reset halt",
+        "flushregs",
+        "thb app_main"
+      ],
+      "env": {
+        "CUSTOM_ENV_VAR": "SOME_VALUE"
+      }
+    },
+    {
+      "name": "GDB",
+      "type": "cppdbg",
+      "request": "launch",
+      "MIMode": "gdb",
+      "miDebuggerPath": "${command:espIdf.getXtensaGdb}",
+      "program": "${workspaceFolder}/build/${command:espIdf.getProjectName}.elf",
+      "windows": {
+        "program": "${workspaceFolder}\\build\\${command:espIdf.getProjectName}.elf"
+      },
+      "cwd": "${workspaceFolder}",
+      "environment": [
+        {
+          "name": "PATH",
+          "value": "${config:idf.customExtraPaths}"
+        }
+      ],
+      "setupCommands": [
+        {
+          "text": "target remote :3333"
+        },
+        {
+          "text": "set remote hardware-watchpoint-limit 2"
+        },
+        {
+          "text": "mon reset halt"
+        },
+        {
+          "text": "thb app_main"
+        },
+        {
+          "text": "flushregs"
+        }
+      ],
+      "externalConsole": false,
+      "logging": {
+        "engineLogging": true
+      }
     }
   ]
 }

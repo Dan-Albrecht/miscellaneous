@@ -1,5 +1,6 @@
 #include "BoardStuff.h"
 
+#include <driver/gpio.h>
 #include <esp_flash.h>
 #include <esp_chip_info.h>
 #include <esp_system.h>
@@ -33,7 +34,7 @@ void DumpSomeBoardStuff(void)
 
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
 
-    if (esp_psram_is_initialized() == false)
+    /*if (esp_psram_is_initialized() == false)
     {
         esp_err_t err = esp_psram_init();
         ESP_ERROR_CHECK(err);
@@ -43,5 +44,6 @@ void DumpSomeBoardStuff(void)
     }
 
     uint32_t psSizeMB = esp_psram_get_size() / (1024 * 1024);
-    printf("PS RAM is %" PRIu32 "MB\n", psSizeMB);
+    printf("PS RAM is %" PRIu32 "MB\n", psSizeMB);*/
+    printf("We have %d pins\n", GPIO_PIN_COUNT);
 }
