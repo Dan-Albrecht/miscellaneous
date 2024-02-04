@@ -366,3 +366,6 @@ Cargo.lock
 # Various binaries files
 *.vhd
 *.bin
+
+# Config file that changes too much
+bx_enh_dbg.ini
