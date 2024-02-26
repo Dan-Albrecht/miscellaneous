@@ -369,3 +369,6 @@ Cargo.lock
 
 # Config file that changes too much
 bx_enh_dbg.ini
+
+# Our disassembled files we use for debugging
+*.disasm.asm
