@@ -1,5 +1,0 @@
-[build]
-target = "./i686-unknown-none.json"
-
-[unstable]
-build-std = ["core"]
